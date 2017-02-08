@@ -10,6 +10,7 @@
 			background-color: black;
 			margin: 50px;
 			padding: 0px;
+			color: white;
 		}
 		div.row div{
 			width: 20px;
@@ -30,6 +31,15 @@
 			height: 20px;
 			top: 70px;
 			left: 70px;
+		}
+		div.name {
+			position: absolute;
+			border-radius: 7px;
+			color: white;
+			background: rgba(100,100,100,0.3);
+			padding: 3px 7px;
+			top: 50px;
+			left: 90px;
 		}
 		div.brick {
 			background-color: red;
@@ -77,227 +87,266 @@
 <body>
 
 	<div id="container">
-		<div id="world"></div>
+		<div id="world">
+			<h1>Welcome to MP Pacman</h1>
+			<h3>What is your name?</h3>
+			<button id="join">Join Game</button> <input type="text" name="name" id="name" maxlength="10">
+		</div>
 		<div id="pacmen"></div>
 		<div id='score'>0</div>
 	</div>
 
 	<script type="text/javascript">
 
+		var name = '';
 
-	$(document).ready(function() { // jQuery bootstrap
+		$(document).ready(function() { // jQuery bootstrap
+			$('#join').click(function() {
+				name = $('#name').val();
+				$('#world').html('');
+				startGame();
+			});
+		}); // end of $(document).ready(function() {
 
-		// Initialize Firebase
-		var config = {
-		  apiKey: "AIzaSyCFdDnKdpQklZYFYr0_RsiiLwFeWiVeyTs",
-		  authDomain: "pacman-e5a2b.firebaseapp.com",
-		  databaseURL: "https://pacman-e5a2b.firebaseio.com",
-		  storageBucket: "pacman-e5a2b.appspot.com",
-		  messagingSenderId: "602877527149"
-		};
-		firebase.initializeApp(config);
+		function startGame() {
 
-		// firebase reference
-		var fbase = firebase.database().ref();
+			// Initialize Firebase
+			var config = {
+			  apiKey: "AIzaSyCFdDnKdpQklZYFYr0_RsiiLwFeWiVeyTs",
+			  authDomain: "pacman-e5a2b.firebaseapp.com",
+			  databaseURL: "https://pacman-e5a2b.firebaseio.com",
+			  storageBucket: "pacman-e5a2b.appspot.com",
+			  messagingSenderId: "602877527149"
+			};
+			firebase.initializeApp(config);
 
-		var world = [
-			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-			[1,9,0,0,0,0,0,0,0,0,0,0,3,1,1,3,0,0,0,0,0,0,5,0,0,0,3,1],
-			[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-			[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-			[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-			[1,3,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,3,0,0,3,0,0,0,0,3,1],
-			[1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
-			[1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
-			[1,0,0,5,0,0,3,1,1,0,0,0,3,1,1,3,0,0,0,1,1,3,0,0,0,0,3,1],
-			[1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1],
-			[1,1,1,1,1,1,0,1,1,0,0,0,3,0,0,3,0,0,5,1,1,0,1,1,1,1,1,1],
-			[1,1,1,1,1,1,0,1,1,0,1,1,1,2,2,1,1,1,0,1,1,0,1,1,1,1,1,1],
-			[0,0,0,0,0,0,3,0,0,3,1,2,2,2,2,2,2,1,3,0,0,3,0,0,0,0,0,0],
-			[1,1,1,1,1,1,0,1,1,0,1,2,4,4,4,4,2,1,0,1,1,5,1,1,1,1,1,1],
-			[1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1],
-			[1,1,1,1,1,1,0,1,1,3,0,0,0,0,0,0,0,0,3,1,1,0,1,1,1,1,1,1],
-			[1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1],
-			[1,3,0,0,0,0,3,0,0,5,0,0,3,1,1,3,0,0,0,0,0,3,0,0,0,0,3,1],
-			[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-			[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-			[1,0,0,0,1,1,0,0,0,3,0,0,0,0,0,0,0,0,3,0,0,0,1,1,5,0,0,1],
-			[1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
-			[1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
-			[1,3,0,0,0,0,3,1,1,0,0,0,3,1,1,3,0,0,0,1,1,3,0,0,0,0,3,1],
-			[1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
-			[1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
-			[1,3,0,0,0,0,5,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,3,1],
-			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
+			// firebase reference
+			var fbase = firebase.database().ref();
 
-		var score = 0;
-		var pacman;
-		var pacmanId;
-		var pacmen;
-		var ghosts = [];
+			var world = [
+				[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+				[1,9,0,0,0,0,0,0,0,0,0,0,3,1,1,3,0,0,0,0,0,0,5,0,0,0,3,1],
+				[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,8],
+				[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+				[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+				[1,3,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,3,0,0,3,0,0,0,0,3,1],
+				[1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
+				[1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
+				[1,0,0,5,0,0,3,1,1,0,0,0,3,1,1,3,0,0,0,1,1,3,0,0,0,0,3,1],
+				[1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1],
+				[1,1,1,1,1,1,0,1,1,0,0,0,3,0,0,3,0,0,5,1,1,0,1,1,1,1,1,1],
+				[1,1,1,1,1,1,0,1,1,0,1,1,1,2,2,1,1,1,0,1,1,0,1,1,1,1,1,1],
+				[0,0,0,0,0,0,3,0,0,3,1,2,2,2,2,2,2,1,3,0,0,3,0,0,0,0,0,0],
+				[1,1,1,1,1,1,0,1,1,0,1,2,4,4,4,4,2,1,0,1,1,5,1,1,1,1,1,1],
+				[1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1],
+				[1,1,1,1,1,1,0,1,1,3,0,0,0,0,0,0,0,0,3,1,1,0,1,1,1,1,1,1],
+				[1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1],
+				[1,3,0,0,0,0,3,0,0,5,0,0,3,1,1,3,0,0,0,0,0,3,0,0,0,0,3,1],
+				[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+				[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+				[1,0,0,0,1,1,0,0,0,3,0,0,0,0,0,0,0,0,3,0,0,0,1,1,5,0,0,1],
+				[1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
+				[1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
+				[1,3,0,0,0,0,3,1,1,0,0,0,3,1,1,3,0,0,0,1,1,3,0,0,0,0,3,1],
+				[1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
+				[1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,8],
+				[1,3,0,0,0,0,5,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,3,1],
+				[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
 
-		loadWorld();
-		displayWorld();
+			var score = 0;
+			var pacman;
+			var pacmanId;
+			var pacmen;
+			var ghosts = [];
 
-		function loadWorld() {
-			var ghost = 0;
-			for (var i = 0; i < world.length; i++) {
-				for (var j = 0; j < world[i].length;  j++) {
-					switch(world[i][j]) {
-						case 4:
-							ghosts.push({y: i, x: j, num: ghost++});
-							break
-						case 9:
-							pacman = {x: j, y: i, r: 0};
-							packmanId = fbase.child('pacmen').push(pacman).key;
-					}
-				}
-			}
-		}
-
-		function displayWorld() {
-			var output = '';
-
-			for (var i = 0; i < world.length; i++) {
-				output += "<div class='row'>";
-				for (var j = 0; j < world[i].length;  j++) {
-					switch (world[i][j]) {
-						case 1: output += "<div class='brick'></div>"; break;
-						case 0: output += "<div class='coin'></div>"; break;
-						case 2: output += "<div class='empty'></div>"; break;
-						case 3: output += "<div class='coin_spin'></div>"; break;
-						case 5: output += "<div class='cherry'></div>"; break;
-						case 4: output += `<div class='ghost ghost${Math.floor((Math.random() * ghosts.length) + 1)}'></div>`; break;
-						case 9: output += "<div class='empty'></div>"; break;
-					}
-				}
-				output += "</div>";
-			}
-			document.getElementById('world').innerHTML = output;
-		}
-
-		function displayScore(){
-			document.getElementById('score').innerHTML = score;
-		}
-
-		function pacmanDies(){
-			$('#pacman').css('background-image', 'none');
-		}
-		
-		function moveGhosts() {
-			for (var i = 0; i < ghosts.length; i++) {
-				var ny = ghosts[i].y;
-				var nx = ghosts[i].x;
-				var direction = Math.floor((Math.random() * 4) + 1);
-				switch(direction) {
-					case 1: nx++; break;
-					case 2: nx--; break;
-					case 3: ny++; break;
-					case 4: ny--;
-				}
-				
-				if (canMove(ny, nx)){
-					world[ghosts[i].y][ghosts[i].x] = 2;
-					ghosts[i].y = ny;
-					ghosts[i].x = nx;
-					world[ny][nx] = 4;
-				}
-			}
+			loadWorld();
 			displayWorld();
-		}
 
-		function canMove(y, x) {
-			if (world[y][x] != 1 && y > 0 && x > 0)
-				return true;
-			else
-				return false;
-		}
+			function loadWorld() {
+				var ghost = 0;
+				for (var i = 0; i < world.length; i++) {
+					for (var j = 0; j < world[i].length;  j++) {
+						switch(world[i][j]) {
+							case 4:
+								ghosts.push({y: i, x: j, num: ghost++});
+								break
+							case 9:
+								pacman = {x: j, y: i, r: 0, n: name};
+								pacmanId = fbase.child('pacmen').push(pacman).key;
 
-		function isCoin(y, x) {
-			if (world[y][x] == 0)
-				return true;
-			else
-				return false;
-		}
-
-		function movePacman(y, x, r) {
-			// Write the new post's data simultaneously in the posts list and the user's post list.
-			pacman.r = r;
-			pacman.y += y;
-			pacman.x += x;
-			var updates = {};
-			updates['/pacmen/' + packmanId] = pacman;
-			fbase.update(updates);
-		}
-
-		// move pacman
-		document.onkeydown = function(e) {
-			if (e.keyCode == 37 && canMove(pacman.y, pacman.x-1)){
-				movePacman(0, -1, 180);
-			}
-			else if(e.keyCode == 39 && canMove(pacman.y, pacman.x+1)){
-				movePacman(0, 1, 0);
-			}
-			else if(e.keyCode == 40 && canMove(pacman.y+1, pacman.x)){
-				movePacman(1, 0, 90);
-			}
-			else if(e.keyCode == 38 && canMove(pacman.y-1, pacman.x)){
-				movePacman(-1, 0, 270);
-			}
-
-			// pacman eats a coin
-			if(isCoin(pacman.y, pacman.x) || world[pacman.y][pacman.x] == 3 || world[pacman.y][pacman.x] == 5) {
-				if (isCoin(pacman.y, pacman.x)) {
-					score += 10;
-				} else if (world[pacman.y][pacman.x] == 3){
-					score += 50;
-				} else if (world[pacman.y][pacman.x] == 5){
-					score += 150;
+						}
+					}
 				}
-				world[pacman.y][pacman.x] = 2;
+			}
+
+			function displayWorld() {
+				var output = '';
+
+				for (var i = 0; i < world.length; i++) {
+					output += "<div class='row'>";
+					for (var j = 0; j < world[i].length;  j++) {
+						switch (world[i][j]) {
+							case 1: output += "<div class='brick'></div>"; break;
+							case 8: output += "<div class='brick'></div>"; break;
+							case 0: output += "<div class='coin'></div>"; break;
+							case 2: output += "<div class='empty'></div>"; break;
+							case 3: output += "<div class='coin_spin'></div>"; break;
+							case 5: output += "<div class='cherry'></div>"; break;
+							case 4: output += `<div class='ghost ghost${Math.floor((Math.random() * ghosts.length) + 1)}'></div>`; break;
+							case 9: output += "<div class='empty'></div>"; break;
+						}
+					}
+					output += "</div>";
+				}
+				document.getElementById('world').innerHTML = output;
+			}
+
+			function displayScore(){
+				document.getElementById('score').innerHTML = score;
+			}
+			
+			function moveGhosts() {
+				for (var i = 0; i < ghosts.length; i++) {
+					var ny = ghosts[i].y;
+					var nx = ghosts[i].x;
+					var direction = Math.floor((Math.random() * 4) + 1);
+					switch(direction) {
+						case 1: nx++; break;
+						case 2: nx--; break;
+						case 3: ny++; break;
+						case 4: ny--;
+					}
+					
+					if (canMove(ny, nx)){
+						world[ghosts[i].y][ghosts[i].x] = 2;
+						ghosts[i].y = ny;
+						ghosts[i].x = nx;
+						world[ny][nx] = 4;
+					}
+				}
 				displayWorld();
-				displayScore();
+				// pacman hits a ghost
+				if(world[pacman.y][pacman.x] == 4) {
+					pacmanDies();
+				}
+			}
+
+			function canMove(y, x) {
+				if (world[y][x] != 1 && y >= 0 && x > -2 && x < 80)
+					return true;
+				else
+					return false;
+			}
+
+			function isCoin(y, x) {
+				if (world[y][x] == 0)
+					return true;
+				else
+					return false;
+			}
+
+			function movePacman(y, x, r) {
+				// Write the new post's data simultaneously in the posts list and the user's post list.
+				pacman.r = r;
+				pacman.y += y;
+				pacman.x += x;
+
+				// check if it's a special place
+				if (pacman.y == 12 && pacman.x == 28) { // teleport left
+					pacman.x = 0;
+				} else if (pacman.y == 12 && pacman.x == -1) { // teleport left
+					pacman.x = 27;
+				}
+				var updates = {};
+				updates['/pacmen/' + pacmanId] = pacman;
+				fbase.update(updates);
+			}
+
+			// move pacman
+			document.onkeydown = function(e) {
+				if (pacmanId) {
+					if (e.keyCode == 37 && canMove(pacman.y, pacman.x-1)){
+						movePacman(0, -1, 180);
+					}
+					else if(e.keyCode == 39 && canMove(pacman.y, pacman.x+1)){
+						movePacman(0, 1, 0);
+					}
+					else if(e.keyCode == 40 && canMove(pacman.y+1, pacman.x)){
+						movePacman(1, 0, 90);
+					}
+					else if(e.keyCode == 38 && canMove(pacman.y-1, pacman.x)){
+						movePacman(-1, 0, 270);
+					}
+
+					// pacman eats a coin
+					if(isCoin(pacman.y, pacman.x) || world[pacman.y][pacman.x] == 3 || world[pacman.y][pacman.x] == 5) {
+						if (isCoin(pacman.y, pacman.x)) {
+							score += 10;
+						} else if (world[pacman.y][pacman.x] == 3){
+							score += 50;
+						} else if (world[pacman.y][pacman.x] == 5){
+							score += 150;
+						}
+						world[pacman.y][pacman.x] = 2;
+						displayWorld();
+						displayScore();
+					}
+				}
+			}
+
+			// move ghost every second
+			window.setInterval(function() {
+				moveGhosts();
+			}, 200);
+
+			// Sync object changes
+			fbase.on('value', function(snap) {
+				var changes = snap.val();
+				if (changes != null) {
+					var pacmen = [];
+					for (var key in changes.pacmen) {
+						var pm = changes.pacmen[key];
+						pacmen.push(pm);
+						if($(`#${key}`).length) { // pacman div exists
+
+						} else { // add a new pacman
+							$('#pacmen').append(`<div id="${key}" class="pacman"></div><div id='${key}name' class='name'>${pacman.n}</div>`);
+						}
+						displayPacman(key, pm);
+						if (key == pacmanId) {
+							pacman = pm;
+						}
+					}
+				}
+			});
+
+			function displayPacman(key, pm) {
+				document.getElementById(key).style.top = pm.y*20+50+"px";
+				document.getElementById(key).style.left = pm.x*20+50+"px";
+				document.getElementById(key+'name').style.top = pm.y*20+30+"px";
+				document.getElementById(key+'name').style.left = pm.x*20+70+"px";
+				$(`#${key}`).rotate(pm.r);
 			}
 
 			// pacman hits a ghost
 			if(world[pacman.y][pacman.x] == 4) {
 				pacmanDies();
 			}
-		}
 
-		// move ghost every second
-		window.setInterval(function() {
-			moveGhosts();
-		}, 200);
+			function pacmanDies(){
 
-		// Sync object changes
-		fbase.on('value', function(snap) {
-			var changes = snap.val();
-			if (changes != null) {
-				var pacmen = [];
-				for (var key in changes.pacmen) {
-					var pm = changes.pacmen[key];
-					pacmen.push(pm);
-					if($(`#${key}`).length) { // pacman div exists
-
-					} else { // add a new pacman
-						$('#pacmen').append(`<div id="${key}" class="pacman"></div>`);
-					}
-					displayPacman(key, pm);
-					if (key == packmanId) {
-						pacman = pm;
-					}
-				}
+				$(`#${pacmanId}`).remove();
+				$('#container').append('<div>You died</div>');
+				fbase.child('pacmen').child(pacmanId).remove();
+				pacmanId = '';
 			}
-		});
 
-		function displayPacman(key, pm) {
-			document.getElementById(key).style.top = pm.y*20+50+"px";
-			document.getElementById(key).style.left = pm.x*20+50+"px";
-			$(`#${key}`).rotate(pm.r);
+			// fbase.child('pacmen').child(pacmanId).onDisconnect.remove(function() {
+			// 	fbase.child('pacmen').child(pacmanId).remove();
+			// });
+
 		}
 
-	}); // end of $(document).ready(function() {
 	</script>
 </body>
 </html>
