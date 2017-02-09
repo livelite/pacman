@@ -10,7 +10,11 @@
 			background-color: black;
 			margin: 50px;
 			padding: 0px;
-			color: white;
+			color: grey;
+			font-family: arial;
+		}
+		h1 {
+			font-size: 50px;
 		}
 		div.row div{
 			width: 20px;
@@ -72,6 +76,14 @@
 			background-image: url('img/cherry.png');
 			background-size: cover;
 		}
+		div#world {
+			display: inline-block;
+			margin-right: 50px;
+		}
+		div#instructions {
+			display: none;
+			vertical-align: top;
+		}
 		div#score {
 			border: 1px solid white;
 			width: 50px;
@@ -91,6 +103,14 @@
 			<h1>Welcome to MP Pacman</h1>
 			<h3>What is your name?</h3>
 			<button id="join">Join Game</button> <input type="text" name="name" id="name" maxlength="10">
+		</div>
+		<div id="instructions">
+			<h1>
+				To Join Game
+			</h1>
+			<h1>
+				livelite.github.io/pacman
+			</h1>
 		</div>
 		<div id="pacmen"></div>
 		<div id='score'>0</div>
@@ -177,6 +197,7 @@
 						}
 					}
 				}
+				$('#instructions').css('display', 'inline-block');
 			}
 
 			function displayWorld() {
@@ -333,12 +354,17 @@
 				pacmanDies();
 			}
 
-			function pacmanDies(){
+			function pacmanDies() {
+				// reset location
 
-				$(`#${pacmanId}`).remove();
-				$('#container').append('<div>You died</div>');
-				fbase.child('pacmen').child(pacmanId).remove();
-				pacmanId = '';
+			}
+
+			function removePlayer(){
+				// remove player
+				// $(`#${pacmanId}`).remove();
+				// $('#container').append('<div>You died</div>');
+				// fbase.child('pacmen').child(pacmanId).remove();
+				// pacmanId = '';
 			}
 
 			// fbase.child('pacmen').child(pacmanId).onDisconnect.remove(function() {
