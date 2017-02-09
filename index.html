@@ -310,7 +310,7 @@
 						if($(`#${key}`).length) { // pacman div exists
 
 						} else { // add a new pacman
-							$('#pacmen').append(`<div id="${key}" class="pacman"></div><div id='${key}name' class='name'>${pacman.n}</div>`);
+							$('#pacmen').append(`<div id="${key}" class="pacman"></div><div id='${key}name' class='name'>${pm.n}</div>`);
 						}
 						displayPacman(key, pm);
 						if (key == pacmanId) {
