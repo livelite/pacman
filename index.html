@@ -31,8 +31,8 @@
 			background-repeat: no-repeat;
 			background-position: center;
 			background-size: cover;
-			width: 20px;
-			height: 20px;
+			width: 4px;
+			height: 4px;
 			top: 70px;
 			left: 70px;
 		}
@@ -191,7 +191,7 @@
 								ghosts.push({y: i, x: j, num: ghost++});
 								break
 							case 9:
-								pacman = {x: j, y: i, r: 0, n: name};
+								pacman = {x: j, y: i, r: 0, s: score, n: name};
 								pacmanId = fbase.child('pacmen').push(pacman).key;
 
 						}
@@ -271,6 +271,7 @@
 				pacman.r = r;
 				pacman.y += y;
 				pacman.x += x;
+				pacman.s = score;
 
 				// check if it's a special place
 				if (pacman.y == 12 && pacman.x == 28) { // teleport left
@@ -278,9 +279,6 @@
 				} else if (pacman.y == 12 && pacman.x == -1) { // teleport left
 					pacman.x = 27;
 				}
-				var updates = {};
-				updates['/pacmen/' + pacmanId] = pacman;
-				fbase.update(updates);
 			}
 
 			// move pacman
@@ -299,20 +297,32 @@
 						movePacman(-1, 0, 270);
 					}
 
-					// pacman eats a coin
-					if(isCoin(pacman.y, pacman.x) || world[pacman.y][pacman.x] == 3 || world[pacman.y][pacman.x] == 5) {
-						if (isCoin(pacman.y, pacman.x)) {
-							score += 10;
-						} else if (world[pacman.y][pacman.x] == 3){
-							score += 50;
-						} else if (world[pacman.y][pacman.x] == 5){
-							score += 150;
-						}
-						world[pacman.y][pacman.x] = 2;
-						displayWorld();
-						displayScore();
+					eatsCoin();
+					world[pacman.y][pacman.x] = 2;
+					updateFirebase();
+					displayWorld();
+					displayScore();
+				}
+			}
+
+			function eatsCoin() {
+				// pacman eats a coin
+				if(isCoin(pacman.y, pacman.x) || world[pacman.y][pacman.x] == 3 || world[pacman.y][pacman.x] == 5) {
+					if (isCoin(pacman.y, pacman.x)) {
+						score += 10;
+					} else if (world[pacman.y][pacman.x] == 3){
+						score += 50;
+					} else if (world[pacman.y][pacman.x] == 5){
+						score += 150;
 					}
 				}
+			}
+
+			// update Pacman's location to Firebase
+			function updateFirebase() {
+				var updates = {};
+				updates['/pacmen/' + pacmanId] = pacman;
+				fbase.update(updates);
 			}
 
 			// move ghost every second
@@ -342,8 +352,13 @@
 			});
 
 			function displayPacman(key, pm) {
+				var widthHeight = Math.round(pm.s / 100)+10;
+				if (widthHeight > 50)
+					widthHeight = 50
 				document.getElementById(key).style.top = pm.y*20+50+"px";
 				document.getElementById(key).style.left = pm.x*20+50+"px";
+				document.getElementById(key).style.width = widthHeight+"px";
+				document.getElementById(key).style.height = widthHeight+"px";
 				document.getElementById(key+'name').style.top = pm.y*20+30+"px";
 				document.getElementById(key+'name').style.left = pm.x*20+70+"px";
 				$(`#${key}`).rotate(pm.r);
@@ -356,7 +371,16 @@
 
 			function pacmanDies() {
 				// reset location
+				pacman.r = 0;
+				pacman.y = 1;
+				pacman.x = 1;
+				// reset score
+				pacman.s = 0;
+				score = 0;
 
+				var updates = {};
+				updates['/pacmen/' + pacmanId] = pacman;
+				fbase.update(updates);
 			}
 
 			function removePlayer(){
