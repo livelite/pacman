@@ -7,7 +7,7 @@ https://livelite.github.io/pacman
 
 ## Built With
 
-* [Plain JavaScript] and
+* Plain JavaScript and
 * [Firebase](https://firebase.google.com) - Firebase gives you the tools and infrastructure you need to build better apps and grow successful businesses
 
 ## Authors
