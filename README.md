@@ -3,7 +3,7 @@ A multiplayer pacman game played in the browser.
 
 ## Demo
 
-https://livelite.github.io/pacman/
+https://livelite.github.io/pacman
 
 ## Built With
 
