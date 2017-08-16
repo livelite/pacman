@@ -1,4 +1,4 @@
-# PackmanMP
+# PacmanMP
 A multiplayer pacman game played in the browser.
 
 ## Demo
